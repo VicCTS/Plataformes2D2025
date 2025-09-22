@@ -1,30 +1,38 @@
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
     private Rigidbody2D _rigidBody;
+    private Animator _animator;
     //private GroundSensor _groundSensor;
 
     private InputAction _moveAction;
     private Vector2 _moveInput;
     private InputAction _jumpAction;
     private InputAction _attackAction;
+    private InputAction _interactAction;
 
     [SerializeField] private float _playerVelocity = 5;
     [SerializeField] private float _jumpHeight = 2;
+    [SerializeField]private bool _alreadyLanded = true;
 
     [SerializeField] private Transform _sensorPosition;
     [SerializeField] private Vector2 _sensorSize = new Vector2(0.5f, 0.5f);
 
+    [SerializeField] private Vector2 _interacitionZone = new Vector2(1, 1);
+
     void Awake()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
+        _animator = GetComponent<Animator>();
         //_groundSensor = GetComponentInChildren<GroundSensor>();
 
         _moveAction = InputSystem.actions["Move"];
         _jumpAction = InputSystem.actions["Jump"];
         _attackAction = InputSystem.actions["Attack"];
+        _interactAction = InputSystem.actions["Interact"];
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -45,6 +53,15 @@ public class PlayerController : MonoBehaviour
         {
             Jump();
         }
+
+        if (_interactAction.WasPerformedThisFrame())
+        {
+            Interact();
+        }
+
+        Movement();
+
+        _animator.SetBool("IsJumping", !IsGrounded());
     }
 
     void FixedUpdate()
@@ -52,9 +69,40 @@ public class PlayerController : MonoBehaviour
         _rigidBody.linearVelocity = new Vector2(_moveInput.x * _playerVelocity, _rigidBody.linearVelocityY);
     }
 
+    void Movement()
+    {
+        if (_moveInput.x < 0)
+        {
+            transform.rotation = Quaternion.Euler(0, 180, 0);
+            _animator.SetBool("IsMoving", true);
+        }
+        else if (_moveInput.x > 0)
+        {
+            transform.rotation = quaternion.Euler(0, 0, 0);
+            _animator.SetBool("IsMoving", true);
+        }
+        else
+        {
+            _animator.SetBool("IsMoving", false);
+        }
+    }
+
     void Jump()
     {
         _rigidBody.AddForce(transform.up * Mathf.Sqrt(_jumpHeight * -2 * Physics2D.gravity.y), ForceMode2D.Impulse);
+    }
+
+    void Interact()
+    {
+        //Debug.Log("haciendo cosas");
+        Collider2D[] interactables = Physics2D.OverlapBoxAll(transform.position, _interacitionZone, 0);
+        foreach (Collider2D item in interactables)
+        {
+            if (item.gameObject.tag == "Star")
+            {
+                Debug.Log("tocando estrella");
+            }
+        }
     }
 
     bool IsGrounded()
@@ -74,5 +122,8 @@ public class PlayerController : MonoBehaviour
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(_sensorPosition.position, _sensorSize);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(transform.position, _interacitionZone);
     }
 }
