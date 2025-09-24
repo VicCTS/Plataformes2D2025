@@ -10,13 +10,18 @@ public class PlayerController : MonoBehaviour
 
     private InputAction _moveAction;
     private Vector2 _moveInput;
+
+    [SerializeField] private InputActionAsset _actionAsset;
+    [SerializeField] private InputActionMap _actionMap;
+    [SerializeField] private string _actionMapName;
+
     private InputAction _jumpAction;
     private InputAction _attackAction;
     private InputAction _interactAction;
 
     [SerializeField] private float _playerVelocity = 5;
     [SerializeField] private float _jumpHeight = 2;
-    [SerializeField]private bool _alreadyLanded = true;
+    [SerializeField] private bool _alreadyLanded = true;
 
     [SerializeField] private Transform _sensorPosition;
     [SerializeField] private Vector2 _sensorSize = new Vector2(0.5f, 0.5f);
@@ -29,10 +34,18 @@ public class PlayerController : MonoBehaviour
         _animator = GetComponent<Animator>();
         //_groundSensor = GetComponentInChildren<GroundSensor>();
 
-        _moveAction = InputSystem.actions["Move"];
+        /*_moveAction = InputSystem.actions["Move"];
         _jumpAction = InputSystem.actions["Jump"];
         _attackAction = InputSystem.actions["Attack"];
-        _interactAction = InputSystem.actions["Interact"];
+        _interactAction = InputSystem.actions["Interact"];*/
+
+
+        _actionMap = _actionAsset.FindActionMap(_actionMapName);
+
+        _moveAction = _actionMap.FindAction("Move");
+        _jumpAction = _actionMap.FindAction("Jump");
+        _attackAction = _actionMap.FindAction("Attack");
+        _interactAction = _actionMap.FindAction("Interact");
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -100,7 +113,12 @@ public class PlayerController : MonoBehaviour
         {
             if (item.gameObject.tag == "Star")
             {
-                Debug.Log("tocando estrella");
+                Star starScript = item.gameObject.GetComponent<Star>();
+
+                if (starScript != null)
+                {
+                    starScript.Interaction();
+                }
             }
         }
     }
