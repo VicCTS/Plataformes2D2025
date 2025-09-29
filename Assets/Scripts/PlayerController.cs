@@ -19,6 +19,9 @@ public class PlayerController : MonoBehaviour
     private InputAction _attackAction;
     private InputAction _interactAction;
 
+    [SerializeField] private int _maxHealth = 10;
+    [SerializeField] private int _currentHealth;
+
     [SerializeField] private float _playerVelocity = 5;
     [SerializeField] private float _jumpHeight = 2;
     [SerializeField] private bool _alreadyLanded = true;
@@ -27,6 +30,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Vector2 _sensorSize = new Vector2(0.5f, 0.5f);
 
     [SerializeField] private Vector2 _interacitionZone = new Vector2(1, 1);
+
 
     void Awake()
     {
@@ -51,7 +55,7 @@ public class PlayerController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        _currentHealth = _maxHealth;
     }
 
     // Update is called once per frame
@@ -121,6 +125,26 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+    }
+
+    void TakeDamage(int damage)
+    {
+        _currentHealth -= damage;
+
+        if (_currentHealth <= 0)
+        {
+            Death();
+        }
+    }
+
+    void Death()
+    {
+        Debug.Log("muerto");
+    }
+
+    public void AnimEvent()
+    {
+        Debug.Log("evento de animacion");
     }
 
     bool IsGrounded()
