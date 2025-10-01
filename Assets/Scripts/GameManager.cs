@@ -5,11 +5,8 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance { get; private set; }
 
-    private bool _isPaused = false;
-
-    [SerializeField] private GameObject _pauseCanvas;
-
-    [SerializeField] private InputActionAsset playerInputs;
+    public bool _isPaused = false;
+    public InputActionAsset playerInputs;
     private InputAction _pauseInput;
 
     int _stars = 0;
@@ -49,18 +46,16 @@ public class GameManager : MonoBehaviour
         if (_isPaused)
         {
             Time.timeScale = 1;
-            _pauseCanvas.SetActive(false);
+            GUIManager.Instance.ChangeCanvasStatus(GUIManager.Instance._pauseCanvas, false);
             playerInputs.FindActionMap("Player").Enable();
             _isPaused = false;
         }
         else
         {
             Time.timeScale = 0;
-            _pauseCanvas.SetActive(true);
+            GUIManager.Instance.ChangeCanvasStatus(GUIManager.Instance._pauseCanvas, true);
             playerInputs.FindActionMap("Player").Disable();
             _isPaused = true;
         }
-        
-        
     }
 }

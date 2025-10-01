@@ -19,8 +19,8 @@ public class PlayerController : MonoBehaviour
     private InputAction _attackAction;
     private InputAction _interactAction;
 
-    [SerializeField] private int _maxHealth = 10;
-    [SerializeField] private int _currentHealth;
+    [SerializeField] private float _maxHealth = 10;
+    [SerializeField] private float _currentHealth;
 
     [SerializeField] private float _playerVelocity = 5;
     [SerializeField] private float _jumpHeight = 2;
@@ -74,6 +74,7 @@ public class PlayerController : MonoBehaviour
         if (_interactAction.WasPerformedThisFrame())
         {
             Interact();
+            TakeDamage(2);
         }
 
         Movement();
@@ -130,6 +131,8 @@ public class PlayerController : MonoBehaviour
     void TakeDamage(int damage)
     {
         _currentHealth -= damage;
+
+        GUIManager.Instance.UpdateHealthBar(_currentHealth, _maxHealth);
 
         if (_currentHealth <= 0)
         {
